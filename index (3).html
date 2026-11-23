@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalkulator Online Lengkap - Standar, Finansial, Zakat & Kesehatan</title>
+  <meta name="description" content="Kumpulan alat hitung online gratis: kalkulator standar, cicilan pinjaman KUR/KPR, harga jual produk UMKM, target tabungan, zakat penghasilan, dan BMI berat badan ideal.">
+  <style>
+    :root {
+      --primary: #0f62fe;
+      --primary-hover: #0353e9;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #161616;
+      --muted: #525252;
+      --border: #e0e0e0;
+      --success-bg: #defbe6;
+      --success-text: #0e6027;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); line-height: 1.6; }
+
+    header {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      padding: 1.2rem 1rem;
+      text-align: center;
+    }
+    header h1 { font-size: 1.5rem; color: var(--primary); }
+    header p { font-size: 0.9rem; color: var(--muted); margin-top: 0.25rem; }
+
+    .container {
+      max-width: 780px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+    }
+
+    .ad-slot {
+      background: #eaeef5;
+      border: 1px dashed #b0bac9;
+      color: #697077;
+      text-align: center;
+      padding: 1rem;
+      margin: 1.2rem 0;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .tab-btn {
+      padding: 0.7rem 0.6rem;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-weight: 600;
+      font-size: 0.88rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    .calc-card {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+      display: none;
+    }
+    .calc-card.active { display: block; }
+    .calc-card h2 { font-size: 1.25rem; margin-bottom: 0.4rem; color: var(--text); }
+    .calc-card .desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 1.2rem; }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.35rem; }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--primary); }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.85rem;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .btn-submit:hover { background: var(--primary-hover); }
+
+    .result-box {
+      margin-top: 1.25rem;
+      padding: 1.2rem;
+      background: var(--success-bg);
+      color: var(--success-text);
+      border-radius: 8px;
+      display: none;
+    }
+    .result-box h3 { font-size: 1rem; margin-bottom: 0.5rem; }
+    .result-item { display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid rgba(14,96,39,0.15); font-size: 0.95rem; }
+    .result-item:last-child { border-bottom: none; font-weight: 700; font-size: 1.05rem; }
+
+    /* Styling Kalkulator Standar */
+    .std-calc-wrapper {
+      max-width: 360px;
+      margin: 0 auto;
+    }
+    .std-display {
+      width: 100%;
+      background: #1e2430;
+      color: #ffffff;
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: right;
+      margin-bottom: 0.8rem;
+      word-wrap: break-word;
+    }
+    .std-history {
+      font-size: 0.85rem;
+      color: #9aa5b1;
+      min-height: 1.2rem;
+    }
+    .std-current {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-top: 0.2rem;
+    }
+    .std-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+    }
+    .std-btn {
+      padding: 1rem 0.5rem;
+      font-size: 1.15rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #f8f9fa;
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .std-btn:active { background: #e2e6ea; }
+    .std-btn.op { background: #e8f0fe; color: var(--primary); border-color: #d0e2ff; }
+    .std-btn.clear { background: #fff1f1; color: #da1e28; border-color: #ffd7d9; }
+    .std-btn.eq { background: var(--primary); color: #fff; border-color: var(--primary); grid-column: span 2; }
+
+    .article-section {
+      background: var(--card);
+      padding: 1.5rem;
+      border-radius: 12px;
+      margin-top: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+    .article-section h2 { font-size: 1.15rem; margin: 1.2rem 0 0.5rem; color: var(--text); }
+    .article-section h2:first-child { margin-top: 0; }
+    .article-section p { font-size: 0.95rem; color: #333; margin-bottom: 0.8rem; }
+
+    footer {
+      background: var(--card);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 1.5rem 1rem;
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .footer-links { margin-top: 0.5rem; }
+    .footer-links button {
+      background: none;
+      border: none;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.85rem;
+      margin: 0 0.4rem;
+      text-decoration: underline;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .modal-content {
+      background-color: var(--card);
+      margin: 5% auto;
+      padding: 1.5rem;
+      border-radius: 12px;
+      max-width: 600px;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      right: 1.2rem;
+      top: 1rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    .modal-content h2 { color: var(--primary); margin-bottom: 0.8rem; font-size: 1.25rem; }
+    .modal-content p { font-size: 0.92rem; margin-bottom: 0.8rem; color: #333; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1 id="site-title">KalkulatorOnline.my.id</h1>
+  <p>Alat Bantu Hitung Standar, Finansial, Bisnis UMKM, Zakat & Kesehatan Gratis</p>
+</header>
+
+<div class="container">
+  <div class="ad-slot">Space Iklan Google AdSense (Atas)</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="openTab('standar', this)">Kalkulator Biasa</button>
+    <button class="tab-btn" onclick="openTab('pinjaman', this)">Cicilan Pinjaman</button>
+    <button class="tab-btn" onclick="openTab('umkm', this)">Harga Jual UMKM</button>
+    <button class="tab-btn" onclick="openTab('tabungan', this)">Target Tabungan</button>
+    <button class="tab-btn" onclick="openTab('zakat', this)">Zakat Profesi</button>
+    <button class="tab-btn" onclick="openTab('bmi', this)">BMI Ideal</button>
+  </div>
+
+  <!-- 0. KALKULATOR STANDAR -->
+  <div id="standar" class="calc-card active">
+    <h2>Kalkulator Standar Online</h2>
+    <p class="desc">Hitung penjumlahan, pengurangan, perkalian, pembagian, dan persentase dengan cepat.</p>
+    <div class="std-calc-wrapper">
+      <div class="std-display">
+        <div class="std-history" id="std-history"></div>
+        <div class="std-current" id="std-current">0</div>
+      </div>
+      <div class="std-grid">
+        <button class="std-btn clear" onclick="stdClear()">C</button>
+        <button class="std-btn op" onclick="stdBackspace()">⌫</button>
+        <button class="std-btn op" onclick="stdPercent()">%</button>
+        <button class="std-btn op" onclick="stdAppend('/')">÷</button>
+
+        <button class="std-btn" onclick="stdAppend('7')">7</button>
+        <button class="std-btn" onclick="stdAppend('8')">8</button>
+        <button class="std-btn" onclick="stdAppend('9')">9</button>
+        <button class="std-btn op" onclick="stdAppend('*')">×</button>
+
+        <button class="std-btn" onclick="stdAppend('4')">4</button>
+        <button class="std-btn" onclick="stdAppend('5')">5</button>
+        <button class="std-btn" onclick="stdAppend('6')">6</button>
+        <button class="std-btn op" onclick="stdAppend('-')">−</button>
+
+        <button class="std-btn" onclick="stdAppend('1')">1</button>
+        <button class="std-btn" onclick="stdAppend('2')">2</button>
+        <button class="std-btn" onclick="stdAppend('3')">3</button>
+        <button class="std-btn op" onclick="stdAppend('+')">+</button>
+
+        <button class="std-btn" onclick="stdAppend('0')">0</button>
+        <button class="std-btn" onclick="stdAppend('.')">.</button>
+        <button class="std-btn eq" onclick="stdCalculate()">=</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. KALKULATOR PINJAMAN -->
+  <div id="pinjaman" class="calc-card">
+    <h2>Kalkulator Cicilan Pinjaman & KUR</h2>
+    <p class="desc">Hitung estimasi angsuran per bulan berdasarkan plafon pinjaman, suku bunga per tahun, dan tenor.</p>
+    <div class="form-group">
+      <label for="pinjaman_pokok">Jumlah Pinjaman (Rp)</label>
+      <input type="number" id="pinjaman_pokok" value="50000000">
+    </div>
+    <div class="form-group">
+      <label for="pinjaman_bunga">Bunga per Tahun (%)</label>
+      <input type="number" id="pinjaman_bunga" step="0.1" value="6">
+    </div>
+    <div class="form-group">
+      <label for="pinjaman_tenor">Jangka Waktu / Tenor (Bulan)</label>
+      <input type="number" id="pinjaman_tenor" value="24">
+    </div>
+    <div class="form-group">
+      <label for="pinjaman_jenis">Jenis Perhitungan Bunga</label>
+      <select id="pinjaman_jenis">
+        <option value="flat">Bunga Flat (KTA & Kredit Kendaraan)</option>
+        <option value="efektif">Bunga Anuitas / Efektif (KUR & KPR)</option>
+      </select>
+    </div>
+    <button class="btn-submit" onclick="hitungPinjaman()">Hitung Cicilan</button>
+    <div id="hasil_pinjaman" class="result-box"></div>
+  </div>
+
+  <!-- 2. KALKULATOR HARGA JUAL UMKM -->
+  <div id="umkm" class="calc-card">
+    <h2>Kalkulator Harga Jual & Margin Profit UMKM</h2>
+    <p class="desc">Tentukan harga jual produk agar tidak rugi setelah dipotong biaya admin marketplace atau promo.</p>
+    <div class="form-group">
+      <label for="umkm_modal">Modal Produksi / HPP per Produk (Rp)</label>
+      <input type="number" id="umkm_modal" value="35000">
+    </div>
+    <div class="form-group">
+      <label for="umkm_margin">Target Keuntungan Bersih (%)</label>
+      <input type="number" id="umkm_margin" value="30">
+    </div>
+    <div class="form-group">
+      <label for="umkm_admin">Biaya Admin Marketplace / Operasional (%)</label>
+      <input type="number" id="umkm_admin" step="0.1" value="8">
+    </div>
+    <button class="btn-submit" onclick="hitungUMKM()">Hitung Harga Jual</button>
+    <div id="hasil_umkm" class="result-box"></div>
+  </div>
+
+  <!-- 3. KALKULATOR TARGET TABUNGAN -->
+  <div id="tabungan" class="calc-card">
+    <h2>Kalkulator Target Tabungan / Dana Darurat</h2>
+    <p class="desc">Cari tahu berapa bulan yang dibutuhkan untuk mencapai target tabungan impian Anda.</p>
+    <div class="form-group">
+      <label for="tabungan_target">Target Dana yang Ingin Dicapai (Rp)</label>
+      <input type="number" id="tabungan_target" value="20000000">
+    </div>
+    <div class="form-group">
+      <label for="tabungan_awal">Saldo Awal Saat Ini (Rp)</label>
+      <input type="number" id="tabungan_awal" value="2000000">
+    </div>
+    <div class="form-group">
+      <label for="tabungan_bulanan">Kemampuan Menabung per Bulan (Rp)</label>
+      <input type="number" id="tabungan_bulanan" value="1500000">
+    </div>
+    <button class="btn-submit" onclick="hitungTabungan()">Hitung Waktu Tercapai</button>
+    <div id="hasil_tabungan" class="result-box"></div>
+  </div>
+
+  <!-- 4. KALKULATOR ZAKAT -->
+  <div id="zakat" class="calc-card">
+    <h2>Kalkulator Zakat Penghasilan (Profesi)</h2>
+    <p class="desc">Hitung kewajiban zakat penghasilan bulanan sebesar 2,5% berdasarkan standar nisab 85 gram emas.</p>
+    <div class="form-group">
+      <label for="zakat_gaji">Total Penghasilan Bulanan (Gaji + Tunjangan) (Rp)</label>
+      <input type="number" id="zakat_gaji" value="10000000">
+    </div>
+    <div class="form-group">
+      <label for="zakat_emas">Asumsi Harga Emas per Gram Saat Ini (Rp)</label>
+      <input type="number" id="zakat_emas" value="1450000">
+    </div>
+    <button class="btn-submit" onclick="hitungZakat()">Hitung Zakat</button>
+    <div id="hasil_zakat" class="result-box"></div>
+  </div>
+
+  <!-- 5. KALKULATOR BMI -->
+  <div id="bmi" class="calc-card">
+    <h2>Kalkulator BMI & Berat Badan Ideal</h2>
+    <p class="desc">Cek kategori indeks massa tubuh (Body Mass Index) Anda berdasarkan berat dan tinggi badan.</p>
+    <div class="form-group">
+      <label for="bmi_berat">Berat Badan (kg)</label>
+      <input type="number" id="bmi_berat" value="65">
+    </div>
+    <div class="form-group">
+      <label for="bmi_tinggi">Tinggi Badan (cm)</label>
+      <input type="number" id="bmi_tinggi" value="170">
+    </div>
+    <button class="btn-submit" onclick="hitungBMI()">Cek BMI Sekarang</button>
+    <div id="hasil_bmi" class="result-box"></div>
+  </div>
+
+  <div class="ad-slot">Space Iklan Google AdSense (Tengah)</div>
+
+  <!-- ARTIKEL EDUKASI SEO -->
+  <article class="article-section">
+    <h2>Panduan Lengkap Menggunakan Kalkulator Online</h2>
+    <p>Perencanaan keuangan, pengelolaan bisnis, hingga pemantauan kesehatan membutuhkan perhitungan yang cepat dan tepat. Seluruh alat bantu di halaman ini—mulai dari kalkulator standar hingga simulasi finansial—dirancang agar dapat langsung digunakan melalui ponsel maupun komputer tanpa perlu menginstal aplikasi tambahan.</p>
+
+    <h2>1. Memahami Bunga Flat dan Anuitas pada Pinjaman</h2>
+    <p>Sebelum mengajukan kredit usaha (KUR), kredit pemilikan rumah (KPR), maupun pinjaman multiguna, penting untuk mengetahui jenis bunga yang diterapkan bank. Pada <strong>bunga flat</strong>, nilai bunga dihitung dari pokok pinjaman awal sehingga cicilan tetap sama dari awal hingga lunas. Sementara pada <strong>bunga anuitas (efektif)</strong>, bunga dihitung dari sisa pokok utang berjalan.</p>
+
+    <h2>2. Cara Menentukan Harga Jual Produk di Marketplace</h2>
+    <p>Banyak pelaku UMKM keliru menghitung harga jual karena hanya menambahkan margin keuntungan dari modal awal tanpa memperhitungkan biaya admin platform, biaya layanan gratis ongkir, serta kemasan. Gunakan fitur Kalkulator UMKM di atas agar margin keuntungan bersih tetap terjaga.</p>
+
+    <h2>3. Ketentuan Nisab Zakat Penghasilan</h2>
+    <p>Zakat profesi wajib ditunaikan apabila penghasilan seseorang telah mencapai batas minimal (nisab) setara 85 gram emas per tahun atau dibagi 12 untuk perhitungan bulanan. Tarif zakat yang dikeluarkan adalah sebesar 2,5% dari penghasilan bruto.</p>
+
+    <h2>4. Mengukur Berat Badan Ideal dengan BMI</h2>
+    <p>Indeks Massa Tubuh atau <em>Body Mass Index</em> (BMI) merupakan metode skrining awal untuk mengetahui apakah berat badan seseorang tergolong kurang, ideal, berlebih, atau obesitas berdasarkan standar kesehatan Asia.</p>
+  </article>
+</div>
+
+<footer>
+  <p>&copy; 2026 <span id="footer-domain">KalkulatorOnline.my.id</span> - Alat Bantu Hitung Gratis</p>
+  <div class="footer-links">
+    <button onclick="openModal('modal-tentang')">Tentang & Kontak</button> |
+    <button onclick="openModal('modal-privasi')">Kebijakan Privasi</button> |
+    <button onclick="openModal('modal-disclaimer')">Disclaimer</button>
+  </div>
+  <p style="margin-top:0.8rem; font-size:0.78rem; color:#666;">
+    This is for informational purposes only. For medical advice or diagnosis, consult a professional. AI responses may include mistakes.
+  </p>
+</footer>
+
+<!-- MODAL TENTANG & KONTAK -->
+<div id="modal-tentang" class="modal" onclick="closeModalOutside(event, 'modal-tentang')">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('modal-tentang')">&times;</button>
+    <h2>Tentang Kami & Kontak</h2>
+    <p>Website ini menyediakan kumpulan alat bantu hitung online gratis yang dirancang untuk memudahkan masyarakat Indonesia dalam melakukan perhitungan sehari-hari, simulasi keuangan, margin bisnis UMKM, kewajiban zakat, dan indeks massa tubuh.</p>
+    <p>Seluruh perhitungan diproses langsung di browser perangkat Anda sehingga privasi data tetap aman.</p>
+    <p><strong>Kontak Admin:</strong> Silakan hubungi kami melalui email di <strong>admin@domainanda.my.id</strong> untuk pertanyaan, masukan, atau laporan kendala teknis.</p>
+  </div>
+</div>
+
+<!-- MODAL KEBIJAKAN PRIVASI -->
+<div id="modal-privasi" class="modal" onclick="closeModalOutside(event, 'modal-privasi')">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('modal-privasi')">&times;</button>
+    <h2>Kebijakan Privasi (Privacy Policy)</h2>
+    <p><strong>1. Perlindungan Data:</strong> Kami tidak mengumpulkan, menyimpan, atau membagikan angka maupun informasi pribadi yang Anda masukkan ke dalam kalkulator di situs ini. Seluruh kalkulasi berjalan secara lokal (client-side).</p>
+    <p><strong>2. Cookies & Iklan Pihak Ketiga:</strong> Situs ini dapat menggunakan layanan periklanan seperti Google AdSense yang memakai cookies untuk menayangkan iklan yang relevan berdasarkan kunjungan pengguna di internet. Anda dapat mengatur preferensi cookie melalui pengaturan browser Anda.</p>
+  </div>
+</div>
+
+<!-- MODAL DISCLAIMER -->
+<div id="modal-disclaimer" class="modal" onclick="closeModalOutside(event, 'modal-disclaimer')">
+  <div class="modal-content">
+    <button class="modal-close" onclick="closeModal('modal-disclaimer')">&times;</button>
+    <h2>Disclaimer (Sangkalan)</h2>
+    <p>Seluruh hasil perhitungan dan artikel di situs web ini disediakan hanya untuk tujuan informasi umum dan simulasi edukasi.</p>
+    <p>Hasil simulasi cicilan, pajak, maupun harga jual dapat berbeda dengan perhitungan aktual lembaga keuangan atau kebijakan platform terkait. Untuk keputusan medis maupun finansial bernilai besar, harap berkonsultasi dengan tenaga profesional terkait.</p>
+  </div>
+</div>
+
+<script>
+  // Otomatis menampilkan nama domain saat dibuka online
+  if (window.location.hostname && window.location.hostname !== 'localhost' && window.location.hostname !== '') {
+    document.getElementById('site-title').textContent = window.location.hostname;
+    document.getElementById('footer-domain').textContent = window.location.hostname;
+  }
+
+  function formatRupiah(angka) {
+    return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+  }
+
+  function openTab(tabId, btn) {
+    document.querySelectorAll('.calc-card').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  function closeModalOutside(event, id) {
+    if (event.target.id === id) {
+      closeModal(id);
+    }
+  }
+
+  // LOGIKA KALKULATOR STANDAR
+  let stdExpr = '';
+  const stdCurrentEl = document.getElementById('std-current');
+  const stdHistoryEl = document.getElementById('std-history');
+
+  function stdUpdateDisplay() {
+    let displayStr = stdExpr.replace(/\*/g, '×').replace(/\//g, '÷');
+    stdCurrentEl.textContent = displayStr || '0';
+  }
+
+  function stdAppend(val) {
+    const operators = ['+', '-', '*', '/'];
+    const lastChar = stdExpr.slice(-1);
+    if (operators.includes(val) && operators.includes(lastChar)) {
+      stdExpr = stdExpr.slice(0, -1) + val;
+    } else if (stdExpr === '' && (val === '*' || val === '/')) {
+      return;
+    } else {
+      stdExpr += val;
+    }
+    stdUpdateDisplay();
+  }
+
+  function stdClear() {
+    stdExpr = '';
+    stdHistoryEl.textContent = '';
+    stdUpdateDisplay();
+  }
+
+  function stdBackspace() {
+    stdExpr = stdExpr.slice(0, -1);
+    stdUpdateDisplay();
+  }
+
+  function stdPercent() {
+    if (!stdExpr) return;
+    try {
+      const val = Function('"use strict";return (' + stdExpr + ')')() / 100;
+      stdHistoryEl.textContent = stdExpr + '%';
+      stdExpr = String(val);
+      stdUpdateDisplay();
+    } catch (e) {
+      stdCurrentEl.textContent = 'Error';
+      stdExpr = '';
+    }
+  }
+
+  function stdCalculate() {
+    if (!stdExpr) return;
+    try {
+      const cleanExpr = stdExpr.replace(/[^0-9+\-*/.()]/g, '');
+      const result = Function('"use strict";return (' + cleanExpr + ')')();
+      if (!isFinite(result)) throw new Error('Invalid');
+      stdHistoryEl.textContent = stdExpr.replace(/\*/g, '×').replace(/\//g, '÷') + ' =';
+      stdExpr = String(Number(result.toFixed(8)));
+      stdUpdateDisplay();
+    } catch (e) {
+      stdCurrentEl.textContent = 'Error';
+      stdExpr = '';
+    }
+  }
+
+  // LOGIKA KALKULATOR PINJAMAN
+  function hitungPinjaman() {
+    const P = parseFloat(document.getElementById('pinjaman_pokok').value) || 0;
+    const bungaTahun = parseFloat(document.getElementById('pinjaman_bunga').value) || 0;
+    const n = parseInt(document.getElementById('pinjaman_tenor').value) || 1;
+    const jenis = document.getElementById('pinjaman_jenis').value;
+
+    if (P <= 0 || n <= 0) return alert('Masukkan nominal pinjaman dan tenor yang valid.');
+
+    let angsuranBulan = 0;
+    let totalBayar = 0;
+    let totalBunga = 0;
+
+    if (jenis === 'flat') {
+      totalBunga = P * (bungaTahun / 100) * (n / 12);
+      totalBayar = P + totalBunga;
+      angsuranBulan = totalBayar / n;
+    } else {
+      const i = (bungaTahun / 100) / 12;
+      if (i === 0) {
+        angsuranBulan = P / n;
+      } else {
+        angsuranBulan = P * (i * Math.pow(1 + i, n)) / (Math.pow(1 + i, n) - 1);
+      }
+      totalBayar = angsuranBulan * n;
+      totalBunga = totalBayar - P;
+    }
+
+    const box = document.getElementById('hasil_pinjaman');
+    box.style.display = 'block';
+    box.innerHTML = `
+      <h3>Hasil Simulasi Pinjaman:</h3>
+      <div class="result-item"><span>Pokok Pinjaman:</span> <span>${formatRupiah(P)}</span></div>
+      <div class="result-item"><span>Total Estimasi Bunga:</span> <span>${formatRupiah(totalBunga)}</span></div>
+      <div class="result-item"><span>Total Pengembalian:</span> <span>${formatRupiah(totalBayar)}</span></div>
+      <div class="result-item"><span>Cicilan per Bulan:</span> <span>${formatRupiah(angsuranBulan)}</span></div>
+    `;
+  }
+
+  // LOGIKA KALKULATOR UMKM
+  function hitungUMKM() {
+    const modal = parseFloat(document.getElementById('umkm_modal').value) || 0;
+    const margin = parseFloat(document.getElementById('umkm_margin').value) || 0;
+    const admin = parseFloat(document.getElementById('umkm_admin').value) || 0;
+
+    if (modal <= 0) return alert('Masukkan modal produksi yang valid.');
+    if (admin >= 100) return alert('Biaya admin tidak boleh 100% atau lebih.');
+
+    const labaBersih = modal * (margin / 100);
+    const hargaSebelumAdmin = modal + labaBersih;
+    const hargaJualFinal = hargaSebelumAdmin / (1 - (admin / 100));
+    const potonganAdmin = hargaJualFinal - hargaSebelumAdmin;
+
+    const box = document.getElementById('hasil_umkm');
+    box.style.display = 'block';
+    box.innerHTML = `
+      <h3>Rekomendasi Harga Jual:</h3>
+      <div class="result-item"><span>Modal (HPP):</span> <span>${formatRupiah(modal)}</span></div>
+      <div class="result-item"><span>Keuntungan Bersih (${margin}%):</span> <span>${formatRupiah(labaBersih)}</span></div>
+      <div class="result-item"><span>Estimasi Potongan Admin (${admin}%):</span> <span>${formatRupiah(potonganAdmin)}</span></div>
+      <div class="result-item"><span>Harga Jual Ideal:</span> <span>${formatRupiah(hargaJualFinal)}</span></div>
+    `;
+  }
+
+  // LOGIKA KALKULATOR TABUNGAN
+  function hitungTabungan() {
+    const target = parseFloat(document.getElementById('tabungan_target').value) || 0;
+    const awal = parseFloat(document.getElementById('tabungan_awal').value) || 0;
+    const bulanan = parseFloat(document.getElementById('tabungan_bulanan').value) || 0;
+
+    if (bulanan <= 0) return alert('Masukkan nominal tabungan per bulan.');
+    const kekurangan = target - awal;
+    const box = document.getElementById('hasil_tabungan');
+    box.style.display = 'block';
+
+    if (kekurangan <= 0) {
+      box.innerHTML = `<h3>Selamat! Target tabungan Anda sudah tercapai.</h3>`;
+      return;
+    }
+
+    const bulan = Math.ceil(kekurangan / bulanan);
+    const tahun = (bulan / 12).toFixed(1);
+
+    box.innerHTML = `
+      <h3>Estimasi Pencapaian Target:</h3>
+      <div class="result-item"><span>Kekurangan Dana:</span> <span>${formatRupiah(kekurangan)}</span></div>
+      <div class="result-item"><span>Menabung per Bulan:</span> <span>${formatRupiah(bulanan)}</span></div>
+      <div class="result-item"><span>Waktu yang Dibutuhkan:</span> <span>${bulan} Bulan (± ${tahun} Tahun)</span></div>
+    `;
+  }
+
+  // LOGIKA KALKULATOR ZAKAT
+  function hitungZakat() {
+    const gaji = parseFloat(document.getElementById('zakat_gaji').value) || 0;
+    const emas = parseFloat(document.getElementById('zakat_emas').value) || 0;
+    const nisabBulan = (85 * emas) / 12;
+    const box = document.getElementById('hasil_zakat');
+    box.style.display = 'block';
+
+    if (gaji >= nisabBulan) {
+      const zakat = gaji * 0.025;
+      box.innerHTML = `
+        <h3>Hasil Perhitungan Zakat:</h3>
+        <div class="result-item"><span>Batas Nisab Bulanan:</span> <span>${formatRupiah(nisabBulan)}</span></div>
+        <div class="result-item"><span>Status:</span> <span>Wajib Zakat</span></div>
+        <div class="result-item"><span>Zakat (2,5% / bulan):</span> <span>${formatRupiah(zakat)}</span></div>
+      `;
+    } else {
+      box.innerHTML = `
+        <h3>Hasil Perhitungan Zakat:</h3>
+        <div class="result-item"><span>Batas Nisab Bulanan:</span> <span>${formatRupiah(nisabBulan)}</span></div>
+        <div class="result-item"><span>Status:</span> <span>Belum Wajib Zakat (Dianjurkan Infak/Sedekah)</span></div>
+      `;
+    }
+  }
+
+  // LOGIKA KALKULATOR BMI
+  function hitungBMI() {
+    const berat = parseFloat(document.getElementById('bmi_berat').value) || 0;
+    const tinggiCm = parseFloat(document.getElementById('bmi_tinggi').value) || 0;
+    if (berat <= 0 || tinggiCm <= 0) return alert('Masukkan berat dan tinggi badan yang valid.');
+
+    const tinggiM = tinggiCm / 100;
+    const bmi = berat / (tinggiM * tinggiM);
+    let kategori = '';
+
+    if (bmi < 18.5) kategori = 'Berat Badan Kurang (Underweight)';
+    else if (bmi <= 22.9) kategori = 'Berat Badan Normal / Ideal';
+    else if (bmi <= 24.9) kategori = 'Kelebihan Berat Badan (Overweight)';
+    else kategori = 'Obesitas';
+
+    const box = document.getElementById('hasil_bmi');
+    box.style.display = 'block';
+    box.innerHTML = `
+      <h3>Hasil Cek BMI:</h3>
+      <div class="result-item"><span>Skor BMI Anda:</span> <span>${bmi.toFixed(1)}</span></div>
+      <div class="result-item"><span>Kategori (Standar Asia):</span> <span>${kategori}</span></div>
+    `;
+  }
+</script>
+
+</body>
+</html>
