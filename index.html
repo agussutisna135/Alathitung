@@ -174,3 +174,152 @@
   </div>
 
   <!-- 6. BMI BERAT BADAN -->
+  <div id="bmi" class="calc-card">
+    <h2>Kalkulator BMI (Indeks Massa Tubuh)</h2>
+    <p class="desc">Cek apakah berat badan Anda sudah tergolong ideal, kurang, atau berlebih berdasarkan tinggi badan.</p>
+    <div class="form-group">
+      <label>Berat Badan (kg)</label>
+      <input type="number" id="bmi-weight" step="0.1" placeholder="Contoh: 65">
+    </div>
+    <div class="form-group">
+      <label>Tinggi Badan (cm)</label>
+      <input type="number" id="bmi-height" placeholder="Contoh: 170">
+    </div>
+    <button class="btn-calc" onclick="calcBmi()">Cek BMI Sekarang</button>
+    <div id="bmi-result" class="result-box"></div>
+  </div>
+
+  <section class="info-section">
+    <h2>Tentang AlatHitung.my.id & Panduan Penggunaan</h2>
+    <p><strong>AlatHitung.my.id</strong> adalah platform penyedia alat bantu hitung berbasis web yang dirancang ringan, responsif, dan menjaga privasi pengguna. Seluruh proses perhitungan dilakukan langsung di perangkat Anda tanpa menyimpan data input ke server mana pun.</p>
+    
+    <h3>1. Cara Menentukan Harga Jual Produk UMKM</h3>
+    <p>Banyak pelaku usaha pemula keliru menghitung keuntungan karena hanya mengalikan modal secara asal. Gunakan fitur <em>Harga Jual UMKM</em> dengan memasukkan total biaya bahan baku, kemasan, dan tenaga kerja sebagai HPP, lalu tentukan persentase profit yang sehat (umumnya 25%–50% untuk produk ritel dan kuliner).</p>
+
+    <h3>2. Ketentuan Nisab Zakat Penghasilan</h3>
+    <p>Zakat penghasilan wajib ditunaikan apabila pendapatan bersih bulanan telah mencapai batas minimum (nisab) yang setara dengan nilai <strong>85 gram emas</strong> dalam satu tahun (atau sekitar 7,08 gram emas per bulan). Besaran zakat yang dikeluarkan adalah sebesar <strong>2,5%</strong> dari total penghasilan.</p>
+
+    <h3>3. Kategori Indeks Massa Tubuh (BMI)</h3>
+    <ul>
+      <li><strong>Di bawah 18,5:</strong> Berat badan kurang (Underweight)</li>
+      <li><strong>18,5 – 24,9:</strong> Berat badan normal / ideal</li>
+      <li><strong>25,0 – 29,9:</strong> Berat badan berlebih (Overweight)</li>
+      <li><strong>30,0 ke atas:</strong> Obesitas</li>
+    </ul>
+  </section>
+
+  <section class="info-section">
+    <h2>Kontak & Dukungan</h2>
+    <p>Jika Anda menemukan kendala teknis, kesalahan rumus, atau ingin mengusulkan alat hitung baru di <strong>AlatHitung.my.id</strong>, silakan hubungi tim pengelola melalui email: <strong>admin@alathitung.my.id</strong>.</p>
+  </section>
+</div>
+
+<footer>
+  <p>
+    <a href="/">Beranda</a> |
+    <a href="privacy-policy.html">Privacy Policy</a> |
+    <a href="disclaimer.html">Disclaimer</a>
+  </p>
+  <p style="margin-top: 10px;">&copy; 2026 AlatHitung.my.id. Hak Cipta Dilindungi Undang-Undang.</p>
+</footer>
+<script>
+  function openTab(tabId, btn) {
+    document.querySelectorAll('.calc-card').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function formatRp(num) {
+    return 'Rp ' + Math.round(num).toLocaleString('id-ID');
+  }
+
+  let stdExpr = '';
+  const screen = document.getElementById('std-screen');
+  function stdAppend(val) {
+    if (stdExpr === '0' && val !== '.') stdExpr = '';
+    stdExpr += val;
+    screen.value = stdExpr;
+  }
+  function stdClear() { stdExpr = ''; screen.value = '0'; }
+  function stdBack() { stdExpr = stdExpr.slice(0, -1); screen.value = stdExpr || '0'; }
+  function stdCalc() {
+    try {
+      const sanitized = stdExpr.replace(/%/g, '/100');
+      const res = Function('"use strict";return (' + sanitized + ')')();
+      stdExpr = String(res);
+      screen.value = stdExpr;
+    } catch {
+      screen.value = 'Error';
+      stdExpr = '';
+    }
+  }
+
+  function calcLoan() {
+    const p = parseFloat(document.getElementById('loan-amount').value);
+    const r = parseFloat(document.getElementById('loan-rate').value);
+    const m = parseInt(document.getElementById('loan-months').value);
+    if (!p || isNaN(r) || !m) return alert('Mohon lengkapi semua kolom pinjaman.');
+    const totalBunga = p * (r / 100) * (m / 12);
+    const totalBayar = p + totalBunga;
+    const cicilan = totalBayar / m;
+    const box = document.getElementById('loan-result');
+    box.style.display = 'block';
+    box.innerHTML = `Estimasi Cicilan per Bulan: <strong>${formatRp(cicilan)}</strong><br>Total Pengembalian (${m} bulan): ${formatRp(totalBayar)}`;
+  }
+
+  function calcUmkm() {
+    const cost = parseFloat(document.getElementById('umkm-cost').value);
+    const margin = parseFloat(document.getElementById('umkm-margin').value);
+    if (!cost || isNaN(margin)) return alert('Mohon isi HPP dan target margin.');
+    const profit = cost * (margin / 100);
+    const price = cost + profit;
+    const box = document.getElementById('umkm-result');
+    box.style.display = 'block';
+    box.innerHTML = `Rekomendasi Harga Jual: <strong>${formatRp(price)}</strong><br>Keuntungan Bersih per Produk: ${formatRp(profit)}`;
+  }
+
+  function calcSavings() {
+    const goal = parseFloat(document.getElementById('save-goal').value);
+    const init = parseFloat(document.getElementById('save-initial').value) || 0;
+    const months = parseInt(document.getElementById('save-months').value);
+    if (!goal || !months) return alert('Mohon isi target dana dan jangka waktu.');
+    const sisa = Math.max(0, goal - init);
+    const perBulan = sisa / months;
+    const box = document.getElementById('save-result');
+    box.style.display = 'block';
+    box.innerHTML = `Target Tabungan per Bulan: <strong>${formatRp(perBulan)}</strong><br>Sisa Dana yang Perlu Dikumpulkan: ${formatRp(sisa)}`;
+  }
+
+  function calcZakat() {
+    const income = parseFloat(document.getElementById('zakat-income').value);
+    const gold = parseFloat(document.getElementById('zakat-gold').value);
+    if (!income || !gold) return alert('Mohon isi penghasilan dan harga emas.');
+    const nisabBulanan = (85 * gold) / 12;
+    const box = document.getElementById('zakat-result');
+    box.style.display = 'block';
+    if (income >= nisabBulanan) {
+      const zakat = income * 0.025;
+      box.innerHTML = `Status: <strong>Wajib Zakat</strong> (Nisab: ${formatRp(nisabBulanan)}/bln)<br>Zakat yang Harus Dibayarkan (2,5%): <strong>${formatRp(zakat)}</strong>`;
+    } else {
+      box.innerHTML = `Status: <strong>Belum Wajib Zakat</strong><br>Penghasilan Anda masih di bawah batas nisab bulanan (${formatRp(nisabBulanan)}).`;
+    }
+  }
+
+  function calcBmi() {
+    const w = parseFloat(document.getElementById('bmi-weight').value);
+    const h = parseFloat(document.getElementById('bmi-height').value) / 100;
+    if (!w || !h) return alert('Mohon isi berat dan tinggi badan.');
+    const bmi = w / (h * h);
+    let kat = 'Obesitas';
+    if (bmi < 18.5) kat = 'Berat Badan Kurang (Underweight)';
+    else if (bmi < 25) kat = 'Normal / Ideal';
+    else if (bmi < 30) kat = 'Berat Badan Berlebih (Overweight)';
+    const box = document.getElementById('bmi-result');
+    box.style.display = 'block';
+    box.innerHTML = `Skor BMI Anda: <strong>${bmi.toFixed(1)}</strong><br>Kategori: <strong>${kat}</strong>`;
+  }
+</script>
+
+</body>
+</html>
